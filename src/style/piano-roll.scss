@@ -1,0 +1,38 @@
+.piano-roll {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+
+  @media (max-width: 940px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 550px) {
+    grid-template-columns: 1fr;
+  }
+
+
+  &-card {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &__svg {
+    border: 2px solid #381815;
+    width: 300px;
+    height: 150px;
+
+    @media (max-width: 1199px) {
+      width: 80%;
+    }
+  }
+
+  &__svg-active {
+    border: 2px solid #381815;
+    width: 80%;
+    height: 60vh;
+  }
+}

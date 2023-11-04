@@ -1,0 +1,30 @@
+.main {
+  margin-top: 45px;
+  width: 100%;
+  display: flex;
+  gap: 20px;
+
+  @media (max-width: 940px) {
+    flex-direction: column;
+  }
+
+  &__card {
+    width: 66%;
+
+    @media (max-width: 940px) {
+      width: 100%;
+    }
+  }
+
+  &__aside {
+    height: 80vh;
+    width: 33%;
+    overflow: hidden;
+    overflow-y: scroll;
+
+    @media (max-width: 940px) {
+      height: 40vh;
+      width: 100%;
+    }
+  }
+}

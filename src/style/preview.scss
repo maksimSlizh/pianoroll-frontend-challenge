@@ -1,0 +1,10 @@
+.preview {
+  display: flex;
+  flex-direction: column;
+
+  &__button {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 10px;
+  }
+}
