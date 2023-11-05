@@ -1,72 +1,114 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 export function MainCard({ elements, it }) {
   const [isSelecting, setIsSelecting] = useState(false)
+  const [selections, setSelections] = useState([])
   const [selectionStart, setSelectionStart] = useState({ x: 0, y: 0 })
   const [selectionEnd, setSelectionEnd] = useState({ x: 0, y: 0 })
-  const [selectedArea, setSelectedArea] = useState(null)
+  const [isHeight, setHeight] = useState(0)
+  const [isTop, setTop] = useState(0)
+  const [highlightMode, setHighlightMode] = useState('blue')
+  const [isDragging, setIsDragging] = useState(false)
+  const [draggedSelectionIndex, setDraggedSelectionIndex] = useState(null)
 
-  const [svgHeight, setSvgHeight] = useState(0)
+  const svgContainerRef = useRef(null);
 
   useEffect(() => {
-    const svgContainer = document.querySelector('.piano-roll__svg-active')
+    const svgContainer = svgContainerRef.current
     if (svgContainer) {
-      setSvgHeight(svgContainer.clientHeight)
+      const rect = svgContainer.getBoundingClientRect()
+      const top = rect.top
+      const height = svgContainer.clientHeight
+      setHeight(height)
+      setTop(top)
     }
-  }, [])
+  }, []);
 
   function handleMouseDown(event) {
-    setIsSelecting(true)
+    if (isDragging) return
+
+    setIsSelecting(true);
     setSelectionStart({ x: event.clientX, y: event.clientY })
     setSelectionEnd({ x: event.clientX, y: event.clientY })
   }
 
   function handleMouseMove(event) {
-    if (isSelecting) {
+    if (isDragging) {
+      if (draggedSelectionIndex !== null) {
+        const newX = event.clientX
+        const newY = selections[draggedSelectionIndex].y
+        const newSelections = [...selections]
+        newSelections[draggedSelectionIndex] = {
+          ...newSelections[draggedSelectionIndex],
+          x: newX,
+          y: newY,
+        };
+        setSelections(newSelections)
+      }
+    } else if (isSelecting) {
       setSelectionEnd({ x: event.clientX, y: event.clientY })
     }
   }
 
   function handleMouseUp() {
+    if (isSelecting) {
+      const x1 = Math.min(selectionStart.x, selectionEnd.x)
+      const y = isTop
+      const width = Math.abs(selectionEnd.x - selectionStart.x)
+      const height = isHeight
+
+      const newSelection = {
+        x: x1,
+        y: y,
+        width: width,
+        height: height,
+        color: highlightMode === 'blue' ? 'blue' : 'yellow',
+      }
+
+      setSelections([...selections, newSelection])
+    }
     setIsSelecting(false)
-
-    const x = Math.min(selectionStart.x, selectionEnd.x)
-    const y = Math.min(selectionStart.y, selectionEnd.y)
-    const width = Math.abs(selectionEnd.x - selectionStart.x)
-    const height = Math.abs(selectionEnd.y - selectionStart.y)
-
-    const top = Math.min(selectionStart.y, selectionEnd.y)
-    const finalY = top < svgHeight ? top : svgHeight - height
-
-    const newSelectedArea = {
-      x: x,
-      y: finalY,
-      width: width,
-      height: height,
-    };
-
-    setSelectedArea(newSelectedArea)
   }
 
-  function resetSelection() {
-    setSelectedArea(null);
+  function handleSelectionMouseDown(index) {
+    if (!isDragging) {
+      setIsDragging(true)
+      setDraggedSelectionIndex(index)
+    }
   }
 
-  const selectedAreaStyle = {
-    position: 'absolute',
-    left: selectedArea ? selectedArea.x + 'px' : '0',
-    top: selectedArea ? selectedArea.y + 'px' : '0',
-    width: selectedArea ? selectedArea.width + 'px' : '0',
-    height: selectedArea ? selectedArea.height + 'px' : '0',
-    backgroundColor: 'rgba(0, 0, 255, 0.2)',
-    border: '1px solid blue',
-    display: selectedArea ? 'block' : 'none',
-  };
+  function handleSelectionMouseUp() {
+    if (isDragging) {
+      setIsDragging(false)
+      setDraggedSelectionIndex(null)
+    }
+  }
+
+  function toggleHighlightMode(mode) {
+    setHighlightMode(mode)
+  }
+
+  function deleteSelection(index) {
+    const newSelections = selections.filter((_, i) => i !== index)
+    setSelections(newSelections)
+  }
 
   return (
     <>
-      <div className="description">This is a piano roll number {it}</div>
+      <div className="main__content">
+        <h3 className="description">This is a piano roll number {it}</h3>
+        <div className="main__row">
+          <button className="button-slow" onClick={() => toggleHighlightMode('blue')}>
+            Slow
+          </button>
+          <button className="button-fast" onClick={() => toggleHighlightMode('yellow')}>
+            Fast
+          </button>
+        </div>
+      </div>
+
       <svg
+        ref={svgContainerRef}
         className="piano-roll__svg-active"
         preserveAspectRatio="none"
         viewBox="0 0 1 1"
@@ -99,8 +141,25 @@ export function MainCard({ elements, it }) {
           ) : null
         ))}
       </svg>
-      <div style={selectedAreaStyle}></div>
-      <button onClick={resetSelection}>Reset Selection</button>
+      {selections.map((selection, index) => (
+        <div
+          key={index}
+          style={{
+            position: 'absolute',
+            left: selection.x + 'px',
+            top: selection.y + 'px',
+            width: selection.width + 'px',
+            height: selection.height + 'px',
+            backgroundColor: selection.color === 'blue' ? 'rgba(0, 0, 255, 0.2)' : 'rgba(255, 255, 0, 0.2)',
+            border: '1px solid ' + selection.color,
+            cursor: isDragging ? 'grabbing' : 'grab',
+          }}
+          onMouseDown={() => handleSelectionMouseDown(index)}
+          onMouseUp={handleSelectionMouseUp}
+        >
+          <button className="button__delete" onClick={() => deleteSelection(index)}>X</button>
+        </div>
+      ))}
     </>
   )
 }
