@@ -1,5 +1,6 @@
 import { getLocalStorage, getAllLocalStorage } from "../helpers/storage"
 import { useParams, NavLink } from 'react-router-dom'
+import { MainCard } from '../components/Card/MainCard'
 import { Card } from '../components/Card/index'
 
 
@@ -24,7 +25,7 @@ export function Main() {
     <div className="container">
       <section className="main">
         <div className="main__card">
-          <Card elements={data} it={query} />
+          <MainCard elements={data} it={query} />
         </div>
         <div className="main__aside">
           {renderCards()}

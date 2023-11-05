@@ -1,12 +1,9 @@
-import { useParams } from 'react-router-dom'
-
 export function Card({ elements, it }) {
-  const { query } = useParams()
 
   return (
     <>
       <div className="description">This is a piano roll number {it}</div>
-      <svg className={query == it ? 'piano-roll__svg-active' : 'piano-roll__svg'}
+      <svg className={'piano-roll__svg'}
         preserveAspectRatio="none"
         viewBox="0 0 1 1">
         {elements.map((element, index) => (
