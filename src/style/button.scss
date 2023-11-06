@@ -33,6 +33,12 @@
     &:hover {
       transform: scale(1.05);
     }
+
+    @media (max-width: 940px) {
+
+      padding: 5px 10px;
+      font-size: 12px;
+    }
   }
 
   &-fast {
@@ -52,5 +58,19 @@
     &:hover {
       transform: scale(1.05);
     }
+
+    @media (max-width: 940px) {
+
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+  }
+
+  &__delete {
+    position: absolute;
+    right: 0;
+    padding: 1px 3px;
+    border: none;
+    background-color: #F0F0F0;
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export function MainCard({ elements, it }) {
   const [isSelecting, setIsSelecting] = useState(false)
@@ -10,8 +10,9 @@ export function MainCard({ elements, it }) {
   const [highlightMode, setHighlightMode] = useState('blue')
   const [isDragging, setIsDragging] = useState(false)
   const [draggedSelectionIndex, setDraggedSelectionIndex] = useState(null)
+  const [lineCoords, setLineCoords] = useState({ x: 0, y1: 0, y2: 0 })
 
-  const svgContainerRef = useRef(null);
+  const svgContainerRef = useRef(null)
 
   useEffect(() => {
     const svgContainer = svgContainerRef.current
@@ -43,11 +44,14 @@ export function MainCard({ elements, it }) {
           x: newX,
           y: newY,
         };
-        setSelections(newSelections)
+        setSelections(newSelections);
       }
     } else if (isSelecting) {
       setSelectionEnd({ x: event.clientX, y: event.clientY })
     }
+
+    const lineX = event.clientX;
+    setLineCoords({ x: lineX, y1: isTop, y2: isTop + isHeight })
   }
 
   function handleMouseUp() {
@@ -63,7 +67,9 @@ export function MainCard({ elements, it }) {
         width: width,
         height: height,
         color: highlightMode === 'blue' ? 'blue' : 'yellow',
-      }
+      };
+
+      console.log('Selection:', newSelection)
 
       setSelections([...selections, newSelection])
     }
@@ -107,45 +113,82 @@ export function MainCard({ elements, it }) {
         </div>
       </div>
 
-      <svg
-        ref={svgContainerRef}
-        className="piano-roll__svg-active"
-        preserveAspectRatio="none"
-        viewBox="0 0 1 1"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        style={{ position: 'relative' }}
+      <div
+
+        style={{
+          position: 'relative',
+        }}
       >
-        {elements.map((element, index) => (
-          element.type === 'rect' ? (
-            <rect
-              key={index}
-              x={element.x}
-              width={element.width}
-              y={element.y}
-              height={element.height}
-              fill={element.fill}
-              className={element.class}
-            />
-          ) : element.type === 'line' ? (
-            <line
-              key={index}
-              x1={element.x1}
-              y1={element.y1}
-              x2={element.x2}
-              y2={element.y2}
-              strokeWidth={element.strokeWidth}
-              stroke={element.stroke}
-            />
-          ) : null
-        ))}
-      </svg>
+        <svg
+          ref={svgContainerRef}
+          className="piano-roll__svg-active"
+          preserveAspectRatio="none"
+          viewBox="0 0 1 1"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+        >
+          {elements.map((element, index) => (
+            element.type === 'rect' ? (
+              <rect
+                key={index}
+                x={element.x}
+                width={element.width}
+                y={element.y}
+                height={element.height}
+                fill={element.fill}
+                className={element.class}
+              />
+            ) : element.type === 'line' ? (
+              <line
+                key={index}
+                x1={element.x1}
+                y1={element.y1}
+                x2={element.x2}
+                y2={element.y2}
+                strokeWidth={element.strokeWidth}
+                stroke={element.stroke}
+              />
+            ) : null
+          ))}
+        </svg>
+
+        {isSelecting && (
+          <div
+            style={{
+              position: 'fixed',
+              left: selectionStart.x + 'px',
+              top: isTop + 'px',
+              width: Math.abs(selectionEnd.x - selectionStart.x) + 'px',
+              height: isHeight + 'px',
+              backgroundColor: highlightMode === 'blue' ? 'rgba(0, 0, 255, 0.2)' : 'rgba(255, 255, 0, 0.2)',
+              border: '1px solid ' + highlightMode,
+              pointerEvents: 'none',
+              zIndex: 9998,
+            }}
+          />
+        )}
+        {!isSelecting && !isDragging && (
+          <div
+            style={{
+              position: 'fixed',
+              left: lineCoords.x + 'px',
+              top: isTop + 'px',
+              width: '1px',
+              height: isHeight + 'px',
+              backgroundColor: 'black',
+              pointerEvents: 'none',
+              zIndex: 9999,
+            }}
+          />
+        )}
+      </div>
+
       {selections.map((selection, index) => (
         <div
           key={index}
           style={{
-            position: 'absolute',
+            position: 'fixed',
             left: selection.x + 'px',
             top: selection.y + 'px',
             width: selection.width + 'px',
@@ -157,7 +200,7 @@ export function MainCard({ elements, it }) {
           onMouseDown={() => handleSelectionMouseDown(index)}
           onMouseUp={handleSelectionMouseUp}
         >
-          <button className="button__delete" onClick={() => deleteSelection(index)}>X</button>
+          <button className="button__delete" onClick={() => deleteSelection(index)}>x</button>
         </div>
       ))}
     </>

@@ -17,6 +17,7 @@
 
   @media (max-width: 940px) {
     flex-direction: column;
+    margin-top: 15px;
   }
 
   &__card {
@@ -34,8 +35,12 @@
     overflow-y: scroll;
 
     @media (max-width: 940px) {
-      height: 40vh;
+      height: 24vh;
       width: 100%;
+    }
+
+    @media (max-width: 550px) {
+      display: none;
     }
   }
 }

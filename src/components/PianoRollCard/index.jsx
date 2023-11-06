@@ -48,7 +48,6 @@ export function PianoRollCard({ data, it }) {
 
   function drawPianoRoll(sequence, backgroundColormap, noteColormap) {
     const start = sequence[0].start
-    const end = sequence[sequence.length - 1].end - start
     const pitches = sequence.map(note => note.pitch)
 
     let pitch_min = Math.min(...pitches)

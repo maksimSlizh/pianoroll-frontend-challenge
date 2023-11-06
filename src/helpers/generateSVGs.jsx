@@ -10,7 +10,7 @@ export function generateSVGs(data) {
         return <PianoRollCard key={it} data={partData} it={it + 1} />
       })}
     </>
-  );
+  )
 }
 
 

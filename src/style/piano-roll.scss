@@ -34,11 +34,21 @@
     @media (max-width: 1199px) {
       width: 80%;
     }
+
+    @media (max-width: 940px) {
+      width: 270px;
+      height: 120px;
+    }
   }
 
   &__svg-active {
+    position: relative;
     border: 2px solid #381815;
     width: 80%;
     height: 400px;
+
+    @media (max-width: 940px) {
+      height: 340px;
+    }
   }
 }
